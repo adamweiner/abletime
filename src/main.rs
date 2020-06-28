@@ -1,8 +1,7 @@
+extern crate abletime;
 extern crate clap;
 
 use clap::Clap;
-
-mod lib;
 
 const ABLETON_SUFFIX: &str = ".als";
 const VERSION: &str = env!("CARGO_PKG_VERSION");
@@ -27,14 +26,15 @@ struct Opts {
 fn main() -> std::io::Result<()> {
     let opts: Opts = Opts::parse();
 
-    let project_files = match lib::scan_project_files(opts.directory, opts.suffix, opts.max_minutes_between_saves) {
+    let project_files = match abletime::scan_project_files(opts.directory, opts.suffix, opts.max_minutes_between_saves)
+    {
         Ok(project_files) => project_files,
         Err(e) => {
             println!("{}", e);
             std::process::exit(1)
         }
     };
-    lib::print_project_summary(project_files);
+    abletime::print_project_summary(project_files);
 
     Ok(())
 }

@@ -1,11 +1,11 @@
 [package]
 name = "abletime"
 version = "0.1.0"
-authors = ["Adam <adamweiner@users.noreply.github.com>"]
+authors = ["Adam Weiner"]
 edition = "2018"
 readme = "README.md"
 license = "MIT"
-repository = "https://github.com/adamweiner/abletime/"
+repository = "https://github.com/adamweiner/abletime"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 

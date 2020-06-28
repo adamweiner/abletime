@@ -1,6 +1,9 @@
+//! [abletime](https://github.com/adamweiner/abletime) is a utility meant for calculating time spent on projects by
+//! inspecting creation and modification timestamps of project files in a particular directory.
+
 extern crate chrono;
 
-use chrono::prelude::*;
+use chrono::prelude::{DateTime, Local};
 use chrono::Duration;
 
 use std::ffi::OsStr;
@@ -8,6 +11,7 @@ use std::fmt;
 use std::fs;
 use std::io;
 
+/// Represents a version of a project and all its relevant metadata.
 #[derive(Debug, Eq, Ord, PartialEq, PartialOrd)]
 pub struct ProjectFile {
     pub created_datetime: DateTime<Local>,
@@ -28,6 +32,7 @@ impl fmt::Display for ProjectFile {
     }
 }
 
+/// Build and return a vector of ProjectFiles in some directory, sorted by creation timestamp.
 fn initialize_project_files(directory: String, project_file_suffix: String) -> Result<Vec<ProjectFile>, io::Error> {
     let mut project_files: Vec<ProjectFile> = Vec::new();
 
@@ -41,7 +46,7 @@ fn initialize_project_files(directory: String, project_file_suffix: String) -> R
             let project_file = ProjectFile {
                 created_datetime: DateTime::<Local>::from(entry.metadata()?.created()?),
                 modified_datetime: DateTime::<Local>::from(entry.metadata()?.modified()?),
-                time_spent: Duration::zero(), // initialize with zero value, calculated in scan_project_files()
+                time_spent: Duration::zero(), // initialize with zero value, calculated after all files are initialized
                 name: path.file_name().and_then(OsStr::to_str).unwrap().to_string(),
             };
             project_files.push(project_file);
@@ -54,6 +59,7 @@ fn initialize_project_files(directory: String, project_file_suffix: String) -> R
     Ok(project_files)
 }
 
+/// Calculate time spent on the provided project files.
 fn calculate_time_spent(project_files: &mut Vec<ProjectFile>, max_time_between_saves: Duration) {
     for i in 0..project_files.len() {
         // start with delta between modified time and creation time
@@ -74,6 +80,21 @@ fn calculate_time_spent(project_files: &mut Vec<ProjectFile>, max_time_between_s
     }
 }
 
+/// Format durations as hh:mm:ss.ms.
+fn format_duration(original_duration: Duration) -> String {
+    let mut duration = original_duration;
+    let hours = duration.num_hours();
+    duration = duration - Duration::hours(hours);
+    let minutes = duration.num_minutes();
+    duration = duration - Duration::minutes(minutes);
+    let seconds = duration.num_seconds();
+    duration = duration - Duration::seconds(seconds);
+    let milliseconds = duration.num_milliseconds();
+
+    format!("{}:{:02}:{:02}.{:03}", hours, minutes, seconds, milliseconds)
+}
+
+/// Find all project files in the given directory and calculate time spent on each.
 pub fn scan_project_files(
     directory: String,
     project_file_suffix: String,
@@ -93,6 +114,7 @@ pub fn scan_project_files(
     Ok(project_files)
 }
 
+/// Print to stdout a summary of time spent on each project file, as well as total time spent on the project.
 pub fn print_project_summary(project_files: Vec<ProjectFile>) {
     if project_files.is_empty() {
         println!("No project files found");
@@ -106,19 +128,6 @@ pub fn print_project_summary(project_files: Vec<ProjectFile>) {
         elapsed = elapsed + project_file.time_spent;
     }
     println!("\nTotal project time\n{}", format_duration(elapsed));
-}
-
-fn format_duration(original_duration: Duration) -> String {
-    let mut duration = original_duration;
-    let hours = duration.num_hours();
-    duration = duration - Duration::hours(hours);
-    let minutes = duration.num_minutes();
-    duration = duration - Duration::minutes(minutes);
-    let seconds = duration.num_seconds();
-    duration = duration - Duration::seconds(seconds);
-    let milliseconds = duration.num_milliseconds();
-
-    format!("{}:{:02}:{:02}.{:03}", hours, minutes, seconds, milliseconds)
 }
 
 #[cfg(test)]
