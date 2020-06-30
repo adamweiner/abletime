@@ -11,7 +11,7 @@ env:
 
 jobs:
   check:
-    name: Check
+    name: Build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -22,8 +22,9 @@ jobs:
           override: true
       - uses: actions-rs/cargo@v1
         with:
-          command: check
-          args: --verbose
+          command: build
+          args:  --release --verbose
+      - run: ./target/release/abletime --help
 
   test:
     name: Test Suite
