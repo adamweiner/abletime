@@ -1,4 +1,4 @@
-//! [abletime](https://github.com/adamweiner/abletime) is a utility meant for calculating time spent on projects by
+//! [abletime](https://github.com/adamweiner/abletime) is a utility for calculating time spent on projects by
 //! inspecting creation and modification timestamps of project files in a particular directory.
 
 extern crate chrono;
