@@ -14,7 +14,7 @@ struct Opts {
     directory: String,
 
     /// Project file suffix. Default value works for Ableton projects
-    #[clap(short = "s", long, default_value = ABLETON_SUFFIX)]
+    #[clap(short, long, default_value = ABLETON_SUFFIX)]
     suffix: String,
 
     /// Maximum number of minutes allowed between saves for time to be counted.
