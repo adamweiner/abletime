@@ -1,6 +1,6 @@
 # abletime
 
-[![CI](https://github.com/adamweiner/abletime/workflows/CI/badge.svg)](![CI](https://github.com/adamweiner/abletime/workflows/CI/badge.svg?branch=master))
+[![CI](https://github.com/adamweiner/abletime/workflows/CI/badge.svg?branch=master)](https://github.com/adamweiner/abletime/actions?query=branch%3Amaster)
 [![MIT license](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/adamweiner/abletime/blob/master/LICENSE)
 
 ## What?
