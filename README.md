@@ -13,10 +13,10 @@ of project files in a particular directory.
 ~~An excuse to learn Rust :)~~
 
 This tool is really only useful for nerds (like [me](https://github.com/adamweiner)) that have let semantic versioning
-influence workflows outside of programming projects (i.e. Ableton projects). Just like code under version control,
-there are lots of benefits to this for other types of projects: ease of going back to an old version, history of changes
-made over time, and freedom to delete things that you don't need in newer versions but may want to reference at some
-point in the future.
+influence workflows outside of programming projects (i.e. Ableton projects, where the project is represented by a
+single file, not a repository full of files). Just like code under version control, there are lots of benefits to this
+for other types of projects: ease of going back to an old version, history of changes made over time, and freedom to
+delete things that you don't need in newer versions but may want to reference at some point in the future.
 
 Suggested approach to semantic versioning for project files:
 * Every new save is a patch version

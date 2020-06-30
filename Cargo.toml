@@ -2,10 +2,13 @@
 name = "abletime"
 version = "0.1.0"
 authors = ["Adam Weiner"]
+description = "A utility for calculating time spent on projects."
 edition = "2018"
 readme = "README.md"
-license = "MIT"
 repository = "https://github.com/adamweiner/abletime"
+license = "MIT"
+keywords = ["ableton", "project", "files", "time"]
+categories = ["command-line-utilities"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
