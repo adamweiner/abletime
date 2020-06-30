@@ -22,7 +22,8 @@ jobs:
           override: true
       - uses: actions-rs/cargo@v1
         with:
-          command: check --verbose
+          command: check
+          args: --verbose
 
   test:
     name: Test Suite
@@ -36,7 +37,8 @@ jobs:
           override: true
       - uses: actions-rs/cargo@v1
         with:
-          command: test --verbose
+          command: test
+          args: --verbose
 
   fmt:
     name: Rustfmt
