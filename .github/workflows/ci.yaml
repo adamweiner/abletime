@@ -24,7 +24,7 @@ jobs:
         with:
           command: build
           args:  --verbose
-      - run: ./target/release/abletime --help
+      - run: ./target/debug/abletime --help
 
   test:
     name: Test Suite
