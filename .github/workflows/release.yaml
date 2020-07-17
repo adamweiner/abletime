@@ -3,6 +3,8 @@ name: Release
 on:
   release:
     types: [released]
+  pull_request:
+    branches: [ master ]
 
 env:
   CARGO_TERM_COLOR: always
