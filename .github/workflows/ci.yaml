@@ -23,7 +23,7 @@ jobs:
       - uses: actions-rs/cargo@v1
         with:
           command: build
-          args:  --verbose
+          args: --verbose
       - run: ./target/debug/abletime --help
 
   test:

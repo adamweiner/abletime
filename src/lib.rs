@@ -195,7 +195,7 @@ pub fn print_project_summary(project_files: &[ProjectFile]) {
     }
 
     println!("{: <21} {: <13} Name", "Start time", "Duration");
-    let mut current_version;
+    let mut current_version: &Option<Version>;
     let mut current_version_idx: usize = 0;
     for idx in 0..project_files.len() {
         current_version = &project_files[idx].version;
