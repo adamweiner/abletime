@@ -1,6 +1,6 @@
 [package]
 name = "abletime"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["Adam Weiner"]
 description = "A utility for calculating time spent on projects."
 edition = "2018"
