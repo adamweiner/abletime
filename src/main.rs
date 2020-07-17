@@ -34,7 +34,7 @@ fn main() -> std::io::Result<()> {
             std::process::exit(1)
         }
     };
-    abletime::print_project_summary(project_files);
+    abletime::print_project_summary(&project_files);
 
     Ok(())
 }
