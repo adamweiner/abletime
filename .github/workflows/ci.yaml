@@ -23,8 +23,8 @@ jobs:
       - uses: actions-rs/cargo@v1
         with:
           command: build
-          args:  --release --verbose
-      - run: ./target/release/abletime --help
+          args: --verbose
+      - run: ./target/debug/abletime --help
 
   test:
     name: Test Suite

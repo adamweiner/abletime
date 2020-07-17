@@ -66,12 +66,16 @@ OPTIONS:
 ```
 
 ```
-$ ./abletime ~/Ableton\ Projects/abletime\ Project
+$ cargo install abletime
+$ abletime ~/Ableton\ Projects/abletime\ Project
 Start time            Duration      Name
+Version 0.0.x - 0:55:42.955
 Fri May 22 11:09:15   0:31:00.002   abletime 0.0.1.als
 Fri May 22 11:40:15   0:06:38.036   abletime 0.0.2.als
 Fri May 22 11:46:53   0:18:04.473   abletime 0.0.3.als
 Fri May 22 12:04:58   0:00:00.443   abletime 0.0.4.als
+
+Version 0.1.x - 0:25:07.077
 Fri May 22 16:53:06   0:25:06.602   abletime 0.1.0.als
 Fri May 22 17:18:12   0:00:00.475   abletime 0.1.1.als
 
@@ -87,6 +91,4 @@ time`. In the example above, they are less than 1s.
 
 ## Things to implement, maybe
 
-* Strict semantic versioning mode which requires a version in every project file name and relies on semver for
-session boundaries, not elapsed time between saves
 * Visualizations
