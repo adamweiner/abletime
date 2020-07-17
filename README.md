@@ -69,7 +69,6 @@ OPTIONS:
 $ cargo install abletime
 $ abletime ~/Ableton\ Projects/abletime\ Project
 Start time            Duration      Name
-
 Version 0.0.x - 0:55:42.955
 Fri May 22 11:09:15   0:31:00.002   abletime 0.0.1.als
 Fri May 22 11:40:15   0:06:38.036   abletime 0.0.2.als
