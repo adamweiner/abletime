@@ -85,14 +85,8 @@ fn calculate_time_spent(project_files: &mut Vec<ProjectFile>, max_time_between_s
 
         // for all but the most recent project file, prefer the delta between creation time and the next version's
         // creation time unless a minor or major version boundary is detected
-        // TODO: is_session_boundary() fn
         if i < project_files.len() - 1
-            && !(project_files[i].version.is_some()
-                && project_files[i + 1].version.is_some()
-                && (project_files[i + 1].version.as_ref().unwrap().minor
-                    > project_files[i].version.as_ref().unwrap().minor
-                    || project_files[i + 1].version.as_ref().unwrap().major
-                        > project_files[i].version.as_ref().unwrap().major))
+            && !is_session_boundary(&project_files[i].version, &project_files[i + 1].version, true)
         {
             let time_spent_before_next_version =
                 project_files[i + 1].created_datetime - project_files[i].created_datetime;
@@ -101,6 +95,31 @@ fn calculate_time_spent(project_files: &mut Vec<ProjectFile>, max_time_between_s
             }
         }
     }
+}
+
+/// Check two (optional) versions to see if they represent a session boundary.
+fn is_session_boundary(
+    current_version: &Option<Version>,
+    next_version: &Option<Version>,
+    require_versions: bool,
+) -> bool {
+    // the next project file is one minor or major version greater than the current
+    if current_version.is_some()
+        && next_version.is_some()
+        && (next_version.as_ref().unwrap().minor > current_version.as_ref().unwrap().minor
+            || next_version.as_ref().unwrap().major > current_version.as_ref().unwrap().major)
+    {
+        return true;
+    // if both project files must be versioned, we're done here
+    } else if require_versions {
+        return false;
+    // one project file is versioned, and the other is not
+    } else if (current_version.is_some() && next_version.is_none())
+        || (next_version.is_some() && current_version.is_none())
+    {
+        return true;
+    }
+    false
 }
 
 /// Format durations as hh:mm:ss.ms.
@@ -115,26 +134,6 @@ fn format_duration(original_duration: &Duration) -> String {
     let milliseconds = duration.num_milliseconds();
 
     format!("{}:{:02}:{:02}.{:03}", hours, minutes, seconds, milliseconds)
-}
-
-/// Find all project files in the given directory and calculate time spent on each.
-pub fn scan_project_files(
-    directory: String,
-    project_file_suffix: String,
-    max_minutes_between_saves: i64,
-) -> Result<Vec<ProjectFile>, io::Error> {
-    let mut project_files: Vec<ProjectFile> = initialize_project_files(directory, project_file_suffix)?;
-
-    // if max_minutes_between_saves is <= 0, effectively disable the max time check by using Duration's max value
-    let max_time_between_saves: Duration = if max_minutes_between_saves > 0 {
-        Duration::minutes(max_minutes_between_saves)
-    } else {
-        Duration::max_value()
-    };
-
-    calculate_time_spent(&mut project_files, max_time_between_saves);
-
-    Ok(project_files)
 }
 
 /// Return the sum of time spent on all provided project files.
@@ -167,6 +166,26 @@ fn print_session_summary(project_files: &[ProjectFile]) {
     println!() // extra newline for readability
 }
 
+/// Find all project files in the given directory and calculate time spent on each.
+pub fn scan_project_files(
+    directory: String,
+    project_file_suffix: String,
+    max_minutes_between_saves: i64,
+) -> Result<Vec<ProjectFile>, io::Error> {
+    let mut project_files: Vec<ProjectFile> = initialize_project_files(directory, project_file_suffix)?;
+
+    // if max_minutes_between_saves is <= 0, effectively disable the max time check by using Duration's max value
+    let max_time_between_saves: Duration = if max_minutes_between_saves > 0 {
+        Duration::minutes(max_minutes_between_saves)
+    } else {
+        Duration::max_value()
+    };
+
+    calculate_time_spent(&mut project_files, max_time_between_saves);
+
+    Ok(project_files)
+}
+
 /// Print to stdout a summary of time spent on each project file, time spent on each session/minor version
 /// (if applicable), and total time spent on the project.
 pub fn print_project_summary(project_files: &[ProjectFile]) {
@@ -182,21 +201,13 @@ pub fn print_project_summary(project_files: &[ProjectFile]) {
         current_version = &project_files[idx].version;
         if idx < project_files.len() - 1 {
             let next_version = &project_files[idx + 1].version;
-            // print summary at session boundaries. session boundaries are defined as follows:
-            //   * the current project file is versioned, and the next is not
-            //   * the next project file is versioned, but the current is not
-            //   * the next project file is one minor or major version greater than the current
-            // TODO: is_session_boundary() fn
-            if current_version.is_some() && next_version.is_none()
-                || (next_version.is_some()
-                    && (current_version.is_none()
-                        || next_version.as_ref().unwrap().minor > current_version.as_ref().unwrap().minor
-                        || next_version.as_ref().unwrap().major > current_version.as_ref().unwrap().major))
-            {
+            // print summary at session boundaries
+            if is_session_boundary(current_version, next_version, false) {
                 print_session_summary(&project_files[current_version_idx..idx + 1]);
                 current_version_idx = idx + 1;
             }
         } else {
+            // print last session summary
             print_session_summary(&project_files[current_version_idx..]);
         }
     }
@@ -273,5 +284,47 @@ mod lib_tests {
         };
         project_files.push(project_file_b);
         assert_eq!(sum_project_durations(&project_files), Duration::seconds(11));
+    }
+
+    #[test]
+    fn test_is_session_boundary() {
+        // session boundary: the next project file is one minor version greater than the current
+        let mut current_version: Option<Version> = Version::parse("0.1.0").ok();
+        let mut next_version: Option<Version> = Version::parse("0.2.0").ok();
+        assert_eq!(is_session_boundary(&current_version, &next_version, false), true);
+        assert_eq!(is_session_boundary(&current_version, &next_version, true), true);
+
+        // session boundary: the next project file is one major version greater than the current
+        next_version = Version::parse("1.0.0").ok();
+        assert_eq!(is_session_boundary(&current_version, &next_version, false), true);
+        assert_eq!(is_session_boundary(&current_version, &next_version, true), true);
+
+        // not a session boundary: the next project file is one patch version greater than the current
+        next_version = Version::parse("0.1.1").ok();
+        assert_eq!(is_session_boundary(&current_version, &next_version, false), false);
+        assert_eq!(is_session_boundary(&current_version, &next_version, true), false);
+
+        // session boundary: current version is some, next version is none
+        current_version = None;
+        assert_eq!(is_session_boundary(&current_version, &next_version, false), true);
+
+        // not a session boundary: current version is some, next version is none, but versions are required
+        assert_eq!(is_session_boundary(&current_version, &next_version, true), false);
+
+        // session boundary: current version is some, next version is none
+        current_version = Version::parse("0.1.0").ok();
+        next_version = None;
+        assert_eq!(is_session_boundary(&current_version, &next_version, false), true);
+
+        // not a session boundary: current version is none, next version is some, but versions are required
+        current_version = None;
+        next_version = Version::parse("0.1.0").ok();
+        assert_eq!(is_session_boundary(&current_version, &next_version, true), false);
+
+        // not a session boundary: both versions are none
+        current_version = None;
+        next_version = None;
+        assert_eq!(is_session_boundary(&current_version, &next_version, true), false);
+        assert_eq!(is_session_boundary(&current_version, &next_version, false), false);
     }
 }
